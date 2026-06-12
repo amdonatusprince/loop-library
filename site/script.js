@@ -1,6 +1,6 @@
 const searchInput = document.querySelector("#loop-search");
 const filterButtons = [...document.querySelectorAll("[data-filter]")];
-const loopCards = [...document.querySelectorAll(".loop-card")];
+const loopRows = [...document.querySelectorAll(".loop-row")];
 const resultsCount = document.querySelector("#results-count");
 const emptyState = document.querySelector("#empty-state");
 const toast = document.querySelector("#toast");
@@ -16,15 +16,15 @@ function updateLibrary() {
   const query = normalize(searchInput.value);
   let visibleCount = 0;
 
-  loopCards.forEach((card) => {
+  loopRows.forEach((row) => {
     const matchesType =
-      activeFilter === "all" || card.dataset.type === activeFilter;
-    const searchableText = `${card.dataset.search} ${card.textContent}`;
+      activeFilter === "all" || row.dataset.type === activeFilter;
+    const searchableText = `${row.dataset.search} ${row.textContent}`;
     const matchesSearch =
       query.length === 0 || normalize(searchableText).includes(query);
     const isVisible = matchesType && matchesSearch;
 
-    card.hidden = !isVisible;
+    row.hidden = !isVisible;
     if (isVisible) {
       visibleCount += 1;
     }
@@ -37,6 +37,7 @@ function updateLibrary() {
 }
 
 searchInput.addEventListener("input", updateLibrary);
+searchInput.addEventListener("search", updateLibrary);
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -58,6 +59,8 @@ filterButtons.forEach((button) => {
     String(button.classList.contains("is-active")),
   );
 });
+
+updateLibrary();
 
 function showToast(message) {
   window.clearTimeout(toastTimer);
@@ -87,8 +90,8 @@ async function copyText(text) {
 
 document.querySelectorAll(".copy-button").forEach((button) => {
   button.addEventListener("click", async () => {
-    const card = button.closest(".loop-card");
-    const prompt = card.querySelector("[data-prompt]").textContent.trim();
+    const row = button.closest(".loop-row");
+    const prompt = row.querySelector("[data-prompt]").textContent.trim();
     const label = button.querySelector("span");
 
     try {
@@ -96,7 +99,7 @@ document.querySelectorAll(".copy-button").forEach((button) => {
       label.textContent = "Copied";
       showToast("Loop copied to clipboard.");
       window.setTimeout(() => {
-        label.textContent = "Copy loop";
+        label.textContent = "Copy";
       }, 1800);
     } catch {
       showToast("Copy failed. Select the prompt text instead.");

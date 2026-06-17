@@ -88,7 +88,7 @@
       href="https://signals.forwardfuture.ai/loop-library/feed.xml"
     />
     <link rel="icon" type="image/png" href="./assets/favicon.png" />
-    <link rel="stylesheet" href="./styles.css?v=20260616-loop-batch" />
+    <link rel="stylesheet" href="./styles.css?v=20260617-weekly-signup" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -225,7 +225,7 @@
         ]
       }
     </script>
-    <script src="./script.js?v=20260615-here-now" defer></script>
+    <script src="./script.js?v=20260617-weekly-signup" defer></script>
     <title>Loop Library: Repeatable AI Agent Workflows | Forward Future</title>
   </head>
   <body>
@@ -246,6 +246,7 @@
 
       <nav class="site-nav" aria-label="Primary navigation">
         <a href="#library">Loops</a>
+        <a href="#weekly">Weekly picks</a>
         <a href="#tips">Best practices</a>
         <button
           class="theme-toggle"
@@ -961,6 +962,61 @@
             prompts.
           </p>
         </section>
+      </section>
+
+      <section class="newsletter-section" id="weekly">
+        <div class="page-width newsletter-layout">
+          <div class="newsletter-copy">
+            <p class="eyebrow">Weekly signal</p>
+            <h2>Get the best loops, once a week.</h2>
+            <p>
+              One practical agent workflow worth stealing, with the prompt,
+              proof, and stopping condition included.
+            </p>
+          </div>
+
+          <form class="newsletter-form" id="weekly-form" novalidate>
+            <label for="weekly-email">Email address</label>
+            <div class="newsletter-form-row">
+              <input
+                id="weekly-email"
+                name="email"
+                type="email"
+                maxlength="160"
+                autocomplete="email"
+                inputmode="email"
+                placeholder="you@example.com"
+                required
+              />
+              <button class="newsletter-button" type="submit">
+                <span>Notify me weekly</span>
+                <span aria-hidden="true">&rarr;</span>
+              </button>
+            </div>
+
+            <div class="form-trap" aria-hidden="true">
+              <label>
+                Company
+                <input
+                  name="newsletter_company"
+                  type="text"
+                  tabindex="-1"
+                  autocomplete="off"
+                />
+              </label>
+            </div>
+
+            <p class="newsletter-note">
+              Weekly only. No spam. Unsubscribe anytime.
+            </p>
+            <p
+              class="form-status newsletter-status"
+              id="weekly-status"
+              role="status"
+              aria-live="polite"
+            ></p>
+          </form>
+        </div>
       </section>
 
       <section class="tips-section" id="tips">

@@ -233,6 +233,42 @@ function optionalValue(formData, name) {
   return value || undefined;
 }
 
+async function postSiteData(
+  collection,
+  payload,
+  key,
+  rateLimitMessage,
+  fallbackMessage,
+) {
+  const response = await fetch(`./.herenow/data/${collection}`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "Idempotency-Key": key,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  let responseBody = {};
+  try {
+    responseBody = await response.json();
+  } catch {
+    responseBody = {};
+  }
+
+  if (!response.ok) {
+    if (response.status === 429) {
+      throw new Error(rateLimitMessage);
+    }
+
+    throw new Error(
+      responseBody.message ||
+        responseBody.error ||
+        fallbackMessage,
+    );
+  }
+}
+
 if (form && submitButton && submitButtonLabel) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -288,35 +324,13 @@ if (form && submitButton && submitButtonLabel) {
     submitButtonLabel.textContent = "Sending";
 
     try {
-      const response = await fetch("./.herenow/data/suggestions", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "Idempotency-Key": idempotencyKey,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      let responseBody = {};
-      try {
-        responseBody = await response.json();
-      } catch {
-        responseBody = {};
-      }
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          throw new Error(
-            "This connection has reached the submission limit. Try again later.",
-          );
-        }
-
-        throw new Error(
-          responseBody.message ||
-            responseBody.error ||
-            "The suggestion could not be submitted.",
-        );
-      }
+      await postSiteData(
+        "suggestions",
+        payload,
+        idempotencyKey,
+        "This connection has reached the submission limit. Try again later.",
+        "The suggestion could not be submitted.",
+      );
 
       form.reset();
       document.querySelectorAll("textarea[maxlength]").forEach((textarea) => {
@@ -336,6 +350,81 @@ if (form && submitButton && submitButtonLabel) {
     } finally {
       submitButton.disabled = false;
       submitButtonLabel.textContent = "Send for review";
+    }
+  });
+}
+
+const weeklyForm = document.querySelector("#weekly-form");
+const weeklyStatus = document.querySelector("#weekly-status");
+const weeklyButton = weeklyForm?.querySelector(".newsletter-button");
+const weeklyButtonLabel = weeklyButton?.querySelector("span");
+
+let weeklyFormStartedAt = performance.now();
+let weeklyIdempotencyKey = makeIdempotencyKey();
+
+function setWeeklyStatus(message, kind = "") {
+  if (!weeklyStatus) {
+    return;
+  }
+
+  weeklyStatus.textContent = message;
+  weeklyStatus.classList.toggle("is-success", kind === "success");
+  weeklyStatus.classList.toggle("is-error", kind === "error");
+}
+
+if (weeklyForm && weeklyButton && weeklyButtonLabel) {
+  weeklyForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    setWeeklyStatus("");
+
+    if (!weeklyForm.checkValidity()) {
+      weeklyForm.reportValidity();
+      setWeeklyStatus("Enter a valid email address.", "error");
+      return;
+    }
+
+    const formData = new FormData(weeklyForm);
+    const honeypot = String(
+      formData.get("newsletter_company") || "",
+    ).trim();
+
+    if (honeypot) {
+      weeklyForm.reset();
+      setWeeklyStatus("You’re on the weekly list.", "success");
+      return;
+    }
+
+    if (performance.now() - weeklyFormStartedAt < 800) {
+      setWeeklyStatus("Take a moment, then submit again.", "error");
+      return;
+    }
+
+    weeklyButton.disabled = true;
+    weeklyButtonLabel.textContent = "Adding";
+
+    try {
+      await postSiteData(
+        "weekly_signups",
+        { email: String(formData.get("email")).trim() },
+        weeklyIdempotencyKey,
+        "This connection has reached the signup limit. Try again later.",
+        "The signup could not be submitted.",
+      );
+      weeklyForm.reset();
+      setWeeklyStatus(
+        "You’re on the list. Watch your inbox for the best loops.",
+        "success",
+      );
+      weeklyIdempotencyKey = makeIdempotencyKey();
+      weeklyFormStartedAt = performance.now();
+    } catch (error) {
+      setWeeklyStatus(
+        error.message || "Something went wrong. Try again in a moment.",
+        "error",
+      );
+    } finally {
+      weeklyButton.disabled = false;
+      weeklyButtonLabel.textContent = "Notify me weekly";
     }
   });
 }

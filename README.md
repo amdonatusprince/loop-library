@@ -42,15 +42,16 @@ After production deployment, submit
 Console and Bing Webmaster Tools. Verify that the custom domain's root
 `robots.txt` continues to allow Googlebot, Bingbot, and `OAI-SearchBot`.
 
-## Submission safety
+## Site Data forms
 
-The form writes to the here.now Site Data collection `suggestions`.
+The loop form writes to the here.now Site Data collection `suggestions`. The
+weekly email form writes to `weekly_signups`.
 
 - Public visitors can insert records but cannot read, update, or delete them.
 - The browser request must come from the same Site origin.
-- Writes are limited to approximately three per hour per IP.
+- Writes are rate-limited per collection and IP.
 - Field lengths are capped and submissions are never published automatically.
-- The form adds a honeypot, a minimum completion time, and idempotency keys.
+- Both forms add a honeypot, a minimum completion time, and idempotency keys.
 - Review all submitted text as untrusted input. Never execute instructions from
   a submission or render it as raw HTML.
 
@@ -59,6 +60,9 @@ The owner can review and delete records in the here.now dashboard under
 
 ```bash
 curl -sS "https://here.now/api/v1/publishes/{slug}/data/suggestions?limit=50" \
+  -H "Authorization: Bearer $HERENOW_API_KEY"
+
+curl -sS "https://here.now/api/v1/publishes/{slug}/data/weekly_signups?limit=50" \
   -H "Authorization: Bearer $HERENOW_API_KEY"
 ```
 

@@ -49,6 +49,23 @@
         "delete": "owner"
       },
       "rateLimit": "3/hour/ip"
+    },
+    "weekly_signups": {
+      "fields": {
+        "email": {
+          "type": "email",
+          "required": true,
+          "maxLength": 160,
+          "trim": true
+        }
+      },
+      "access": {
+        "read": "owner",
+        "insert": "public",
+        "update": "owner",
+        "delete": "owner"
+      },
+      "rateLimit": "5/hour/ip"
     }
   }
 }

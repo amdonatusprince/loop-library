@@ -11,12 +11,14 @@
   contributor attribution, published and modified dates, practical context,
   verification criteria, and related-loop links.
 - After changing the catalog or homepage rows, run
+  `node scripts/build-skill-catalog.mjs` and
   `node scripts/build-loop-pages.mjs`, capture the versioned page screenshots,
-  and then run `node scripts/build-social-images.mjs`. Commit the screenshots,
-  generated detail pages, `site/sitemap.xml`, and `site/feed.xml`.
+  and then run `node scripts/build-social-images.mjs`. Commit the skill catalog,
+  screenshots, generated detail pages, `site/sitemap.xml`, and `site/feed.xml`.
 - Run the full repository checks before committing:
 
   ```bash
+  node scripts/build-skill-catalog.mjs
   node scripts/build-loop-pages.mjs
   node scripts/build-social-images.mjs
   node --check scripts/build-social-images.mjs
@@ -29,8 +31,9 @@
   git diff --check
   ```
 
-- Do not add a loop if the checks report drift between the homepage, catalog,
-  generated pages, structured data, sitemap, or feed.
+- Do not add a loop if the checks report drift between the homepage, source
+  catalog, installable skill catalog, generated pages, structured data,
+  sitemap, or feed.
 
 ## Deployment
 

@@ -10,10 +10,12 @@ import {
   loops,
   site as siteMeta,
 } from "./loop-data.mjs";
+import { renderSkillCatalog } from "./build-skill-catalog.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const siteRoot = path.join(root, "site");
 const workerRoot = path.join(root, "worker");
+const skillRoot = path.join(root, "skills", "loop-library");
 
 const [
   html,
@@ -27,6 +29,9 @@ const [
   hereNowIcon,
   loopDirectories,
   loopPages,
+  skillSource,
+  skillCatalog,
+  skillInterface,
 ] =
   await Promise.all([
     readFile(path.join(siteRoot, "index.html"), "utf8"),
@@ -47,7 +52,10 @@ const [
         ),
       ),
     ),
-]);
+    readFile(path.join(skillRoot, "SKILL.md"), "utf8"),
+    readFile(path.join(skillRoot, "references", "catalog.md"), "utf8"),
+    readFile(path.join(skillRoot, "agents", "openai.yaml"), "utf8"),
+  ]);
 
 const dataManifest = JSON.parse(dataSource);
 const wranglerConfig = JSON.parse(wranglerSource);
@@ -149,6 +157,12 @@ assert(loops.every((loop) => !Object.hasOwn(loop, "type")));
 assert(loops.every((loop) => !Object.hasOwn(loop, "typeSlug")));
 assert(requestedConceptSlugs.every((slug) => slugs.has(slug)));
 assert.deepEqual(loopDirectories.sort(), [...slugs].sort());
+assert.equal(skillCatalog, renderSkillCatalog());
+assert(skillSource.startsWith("---\nname: loop-library\ndescription:"));
+assert(skillSource.includes("## Run the design interview"));
+assert(skillSource.includes("## Deliver the loop"));
+assert(skillInterface.includes('display_name: "Loop Library"'));
+assert(skillInterface.includes("$loop-library"));
 
 for (const [index, loop] of loops.entries()) {
   const url = `${siteMeta.baseUrl}loops/${loop.slug}/`;

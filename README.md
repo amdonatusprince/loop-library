@@ -2,6 +2,20 @@
 
 A Forward Future microsite collecting useful agentic engineering loops.
 
+## Install the agent skill
+
+Install the Loop Library skill globally with the open agent-skills CLI. It can
+recommend published loops, adapt one to your situation, or interview you and
+turn an outcome into a bounded, copy-ready loop.
+
+```bash
+npx skills add mberman84/loop-library --skill loop-library -g
+```
+
+Once installed, ask your coding agent to find a loop for a problem or help you
+design one. For example: `Help me design a loop that turns customer feedback
+into verified fixes.`
+
 ## Local preview
 
 ```bash
@@ -14,6 +28,7 @@ Then open `http://localhost:4173`.
 
 ```bash
 npm --prefix worker install
+node scripts/build-skill-catalog.mjs
 node scripts/build-loop-pages.mjs
 node scripts/build-social-images.mjs
 node --check scripts/build-social-images.mjs
@@ -33,14 +48,17 @@ When adding or editing a loop:
 1. Update the table row and visible count in `site/index.html`.
 2. Update the matching entry and social-image version in
    `scripts/loop-data.mjs`.
-3. Run `node scripts/build-loop-pages.mjs` so every page reflects the catalog.
-4. Capture 1200 × 630 light-theme screenshots of the homepage and each loop
+3. Run `node scripts/build-skill-catalog.mjs` so the installable skill can find
+   every published loop offline.
+4. Run `node scripts/build-loop-pages.mjs` so every page reflects the catalog.
+5. Capture 1200 × 630 light-theme screenshots of the homepage and each loop
    page using the versioned filenames in `site/assets/social/`.
-5. Run `node scripts/build-social-images.mjs`.
-6. Run the checks above.
+6. Run `node scripts/build-social-images.mjs`.
+7. Run the checks above.
 
 The generator writes:
 
+- `skills/loop-library/references/catalog.md`
 - `site/assets/social/*.<png|jpg>`
 - `site/loops/<slug>/index.html`
 - `site/sitemap.xml`
